@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- External styles -->
+    <link rel="stylesheet" type="text/css" media="screen" href="./@fortawesome/fontawesome-free/css/all.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="./bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+</head>
+<body>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <h1><i class="fa fa-sun"></i> Weather Chat  
+                <i class="fa fa-cloud"></i>
+            </h1>  
+        </div>
+        <div class="col-md-8 col-md-offset-2">
+            <form class="form-get col-md-12 panel panel-default">
+                <br>
+                <div class="form-group col-md-10">
+                    <input type="text" id="city-name" class="form-control" placeholder="Enter City">
+                </div>
+                <div class="form-group col-md-1">
+                    <input type="submit" class="btn btn-primary get-btn" value="Get Temp">
+                </div>
+            </form>  
+        </div>
+        <div class="weather-boxes col-md-8 col-md-offset-2">
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <!-- External scripts -->
+    <script src="https://code.jquery.com/jquery-3.2.1.js "></script>
+    <script src="./jquery/dist/jquery.min.js "></script>
+    <script src="./handlebars/dist/handlebars.min.js "></script>
+    
+    <script id="entry-template" type="text/x-handlebars-template">
+        {{#each weatherBoxes}}
+        <div class="box panel panel-default col-md-12" box-id={{id}}>
+            <h3>{{cityName}} <a href="#" class="trash-btn"><i class="fa fa-trash-alt" aria-hidden="true"></i></a></h3>
+            <p><i class="fas fa-thermometer-empty"></i> 
+                {{tempCelsius}}<i class="fa fa-genderless" aria-hidden="true"></i>C / 
+                {{tempFahrenheit}}<i class="fa fa-genderless" aria-hidden="true"></i>F, {{timeStamp}} 
+            </p>
+            {{#each comments}}
+            <p class="comment" comment-id={{id}}>{{cText}}
+                <a href="#" class="remove-comment"><i class="far fa-trash-alt"></i></a>
+            </p>
+            {{/each}}
+            <div class="col-md-10 col-md-offset-1">
+                <form  data-id="{{cityName}}-{{id}}" class="form-comment">
+                    <div class="form-group col-md-11">
+                        <input type="text" class="comment-text form-control" placeholder="Comment about the weater in {{cityName}}">
+                    </div>
+                    <div class="form-group col-md-1">
+                        <input type="submit" class="btn btn-primary add-comment-btn" value="Comment">
+                    </div>
+                </form> 
+            </div>       
+        </div>
+        {{/each}}
+    </script> 
+    
+    <script src="script.js"></script>
+    
+    
+</body>
+</html>

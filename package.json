@@ -1,0 +1,19 @@
+{
+    "name": "bookeeper",
+    "version": "1.0.0",
+    "description": "",
+    "main": "script.js",
+    "scripts": {
+        "test": "echo \\\"Error: no test specified\\\" && exit 1"
+    },
+    "author": "hilli",
+    "license": "ISC",
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.2.0",
+        "bootstrap": "^3.3.7",
+        "express": "^4.16.3",
+        "handlebars": "^4.0.11",
+        "jquery": "3.2.1"
+    },
+    "devDependencies": {}
+}
