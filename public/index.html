@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
 </head>
 <body>
-    <div class="row">
+    <div class="row background">
         <div class="col-md-8 col-md-offset-2">
             <h1><i class="fa fa-sun"></i> Weather Chat  
                 <i class="fa fa-cloud"></i>
@@ -26,6 +26,17 @@
                 </div>
                 <div class="form-group col-md-1">
                     <input type="submit" class="btn btn-primary get-btn" value="Get Temp">
+                </div>
+                <div class="form-group col-md-2">
+                    <select id="sort-select">
+                        <option value="select">Sort By</option>
+                        <option value="city">City</option>
+                        <option value=temp>Temprature</option>
+                        <option value="date">Date</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-1">
+                    <input type="submit" class="btn btn-primary sort-btn" value="Sort">
                 </div>
             </form>  
         </div>
@@ -41,24 +52,27 @@
     
     <script id="entry-template" type="text/x-handlebars-template">
         {{#each weatherBoxes}}
-        <div class="box panel panel-default col-md-12" box-id={{id}}>
-            <h3>{{cityName}} <a href="#" class="trash-btn"><i class="fa fa-trash-alt" aria-hidden="true"></i></a></h3>
+        <div class="box panel panel-default col-md-6 col-md-offset-0" box-id={{id}}>
+            <a href="#" class="remove-box-btn"><i class="fa fa-trash-alt" aria-hidden="true"></i></a>
+            <h2>{{cityName}} <i class="fa fa-thumbtack"></i></h2>
             <p><i class="fas fa-thermometer-empty"></i> 
                 {{tempCelsius}}<i class="fa fa-genderless" aria-hidden="true"></i>C / 
                 {{tempFahrenheit}}<i class="fa fa-genderless" aria-hidden="true"></i>F, {{timeStamp}} 
             </p>
+            <div class="comment-box col-md-6 col-md-offset-1">
             {{#each comments}}
             <p class="comment" comment-id={{id}}>{{cText}}
                 <a href="#" class="remove-comment"><i class="far fa-trash-alt"></i></a>
             </p>
             {{/each}}
-            <div class="col-md-10 col-md-offset-1">
+            </div>
+            <div class="col-md-12 col-md-offset-0">
                 <form  data-id="{{cityName}}-{{id}}" class="form-comment">
-                    <div class="form-group col-md-11">
+                    <div class="form-group col-md-12">
                         <input type="text" class="comment-text form-control" placeholder="Comment about the weater in {{cityName}}">
                     </div>
-                    <div class="form-group col-md-1">
-                        <input type="submit" class="btn btn-primary add-comment-btn" value="Comment">
+                    <div class="form-group col-md-2">
+                        <input type="submit" class="btn btn-success add-comment-btn" value="Comment">
                     </div>
                 </form> 
             </div>       
@@ -67,7 +81,5 @@
     </script> 
     
     <script src="script.js"></script>
-    
-    
 </body>
 </html>

@@ -1,0 +1,32 @@
+.background {
+    background-image: url('https://image.freepik.com/free-vector/weather-pattern_1061-487.jpg');
+}
+
+.box{
+    width: 46%;
+    height: 50%;
+    padding: 15px;
+    margin-left: 3.5%;
+    border: solid;
+}
+
+.remove-box-btn {
+    position: relative; 
+    left: 95%;
+}
+
+.comment-box{
+    background-color: lightgoldenrodyellow;
+    width: 312px;
+    height: 80px;
+    overflow: scroll;
+}
+
+h2 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.form-get {
+    border: solid;
+}

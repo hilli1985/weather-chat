@@ -1,20 +1,40 @@
-var STORAGE_ID = "WeatherBox";  
+var STORAGE_ID = "WeatherBox"; 
+var STORAGE_ID2 = "WeatherBoxID"; 
+let dataWeather;
+
+
 var getFromLocalStorage = function () {
     let tempvar =  JSON.parse(localStorage.getItem(STORAGE_ID) || '[]'); //return empty array in case of null
     return tempvar;
 }
+
 var saveToLocalStorage = function () {
     localStorage.setItem(STORAGE_ID, JSON.stringify(appWeather.weatherBoxes));
 }
 
+var getFromLocalStorage2 = function () {
+    let tempvar2 =  JSON.parse(localStorage.getItem(STORAGE_ID2) || 0); //return empty array in case of null
+    return tempvar2;
+}
+
+var saveToLocalStorage2 = function () {
+    localStorage.setItem(STORAGE_ID2, JSON.stringify(idUnique));
+}
 
 let appWeather={ 
-    weatherBoxes : getFromLocalStorage()
-    //weatherBoxes : []
+    //weatherBoxes : getFromLocalStorage(),
+    weatherBoxes : []   ,
 };
-let dataWeather;
-let idUnique = 0; //there is a special random generator
 
+var updateAllBoxes = function() {
+    if (weatherBoxesTemp.length===0) {
+        return;
+    }
+    for(w of weatherBoxesTemp){
+        console.log(w.cityName);
+        fetch(w.cityName);
+    }
+}
 
 //use it latter
 const S4 = function () {
@@ -47,10 +67,18 @@ class Comment {
 var source = $("#entry-template").html();
 var template = Handlebars.compile(source);
 
-var renderWeatherBox = function () {
+var renderWeatherBox = function (msg,persist) {
     $('.weather-boxes').empty();
-    var newHTML = template(appWeather);
-    $('.weather-boxes').append(newHTML);    
+    if (persist){
+        $('.weather-boxes').append(msg);   
+        var newHTML = template(appWeather);
+        $('.weather-boxes').append(newHTML);
+    }
+    else{
+        $('.weather-boxes').html(msg);   
+        var newHTML = template(appWeather);
+        $('.weather-boxes').html(newHTML);
+    }    
 }
 
 //convert to the desire date format
@@ -68,14 +96,21 @@ var convertToDateFormat = function (today){
     return dateStr
 }
 
-//temp in [°C]
+//convert temp to [°C]
 var convertFromKelvinToCelcius = function(temp){
     return Math.round((temp)-273.15);
 }
 
-//temp in [°F]
+//convert temp to [°F]
 var convertFromKelvinToFahrenheit = function(temp){
     return Math.round(((temp)*9/5)-459.67);
+}
+
+var addNewWBToArray = function (dataWeather) {
+    let newWB = createNewWeatherBox(dataWeather);
+    appWeather.weatherBoxes.push(newWB);
+    saveToLocalStorage();
+    saveToLocalStorage2();
 }
 
 var createNewWeatherBox = function (dataWeather){
@@ -83,10 +118,9 @@ var createNewWeatherBox = function (dataWeather){
     var tempF = convertFromKelvinToFahrenheit(dataWeather.main.temp);
     var timeStamp = convertToDateFormat(new Date());
     var newWB = new WeatherBox(++idUnique, dataWeather.name,tempC,tempF,timeStamp);
-    appWeather.weatherBoxes.push(newWB); 
-    saveToLocalStorage();
+    return newWB; 
+    //console.log(dataWeather.clouds);
 }
-
 
 var addCommentToBox= function (id,text,boxID) {
     var newComment = new Comment(id,text);
@@ -125,7 +159,6 @@ var removeCommentById= function (boxID, commentID) {
     saveToLocalStorage();    
 }
 
-
 var fetch = function(city){
     let apiKey = '1e9ddeb964fa9b9eaabb6f3a02c21cda';
     let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${apiKey}`;
@@ -134,8 +167,8 @@ var fetch = function(city){
         url: url,
         success: function(data) {
             dataWeather = data;
-            createNewWeatherBox(dataWeather);
-            renderWeatherBox();
+            addNewWBToArray(dataWeather);
+            renderWeatherBox('<h1>Please wait...</h1>',false);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(textStatus);
@@ -143,7 +176,31 @@ var fetch = function(city){
     });
 };
 
-renderWeatherBox();
+var sortBySelect = function (select) {
+    let msg;
+    if (appWeather.weatherBoxes.length<=1){
+        msg = "<h1>You don't have enough entries to sort</h1>"; 
+    }
+    else if (select=='select'){
+        msg ='<h1>Hint: You have to select first before sort.</h1>';
+    }
+    else if (select=='city') {
+        appWeather.weatherBoxes.sort(function(a, b){return a.cityName > b.cityName});
+    }
+    else if (select=='temp') {
+        appWeather.weatherBoxes.sort(function(a, b){return a.tempCelsius > b.tempCelsius});     
+    }
+    else if (select=='date') {
+        appWeather.weatherBoxes.sort(function(a, b){return a.timeStamp > b.timeStamp});
+    } 
+    saveToLocalStorage(); 
+    renderWeatherBox(msg,true); 
+}
+
+let weatherBoxesTemp = getFromLocalStorage();
+let idUnique = getFromLocalStorage2(); //there is a special random generator
+updateAllBoxes();
+//renderWeatherBox('',false);
 
 //Events
 $('.form-get').on('click', '.get-btn', function(e) {  
@@ -152,10 +209,17 @@ $('.form-get').on('click', '.get-btn', function(e) {
     fetch(city);
 });
 
-$('.weather-boxes').on('click', '.trash-btn', function() {  
+$('.form-get').on('click', '.sort-btn', function(e) {  
+    e.preventDefault();
+    let select = $('.form-get').find('#sort-select').val();
+    sortBySelect(select);
+});
+
+
+$('.weather-boxes').on('click', '.remove-box-btn', function() {  
     let id = $(this).closest('.box').attr('box-id');
     removeWeatherBoxById(id);
-    renderWeatherBox();
+    renderWeatherBox('',false);
 });
 
 $('.weather-boxes').on('click', '.add-comment-btn', function(e) {  
@@ -164,14 +228,16 @@ $('.weather-boxes').on('click', '.add-comment-btn', function(e) {
     let commentText = $(this).closest('.form-comment').find('.comment-text').val();
     let boxID = $(this).closest('.box').attr('box-id');
     addCommentToBox(commentID,commentText,boxID);
-    renderWeatherBox();
+    renderWeatherBox('',false);
 });
 
 $('.weather-boxes').on('click', '.remove-comment', function() {  
     let commentID = $(this).closest('.comment').attr('comment-id');
     let boxID = $(this).closest('.box').attr('box-id');
     removeCommentById(boxID,commentID);
-    renderWeatherBox();
+    renderWeatherBox('',false);
 });
+
+
 
 
