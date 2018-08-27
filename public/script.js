@@ -2,7 +2,6 @@ var STORAGE_ID = "WeatherBox";
 var STORAGE_ID2 = "WeatherBoxID"; 
 let dataWeather;
 
-
 var getFromLocalStorage = function () {
     let tempvar =  JSON.parse(localStorage.getItem(STORAGE_ID) || '[]'); //return empty array in case of null
     return tempvar;
@@ -164,17 +163,16 @@ var fetch = function(city){
     let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${apiKey}`;
     $.ajax({
         method: "GET",
-        url: url,
-        success: function(data) {
-            dataWeather = data;
-            addNewWBToArray(dataWeather);
-            renderWeatherBox('<h1>Please wait...</h1>',false);
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.log(textStatus);
-        }
+        url: url
+    }).then(function(response) {
+        dataWeather = response;
+        addNewWBToArray(dataWeather);
+        renderWeatherBox('<h1>Please wait...</h1>',false);
+      
+    }).catch(function(jqXHR, textStatus, errorThrown) {
+                     console.log(textStatus);
     });
-};
+};   
 
 var sortBySelect = function (select) {
     let msg;
